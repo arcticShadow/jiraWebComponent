@@ -1,5 +1,5 @@
 var conf = {};
-conf = require('./config.json');
+//conf = require('./config.json');
 var _ = require('lodash');
 
 var defaults = {
