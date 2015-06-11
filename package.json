@@ -21,7 +21,29 @@
     "postinstall": "gulp clean compile"
   },
   "peerDependencies": {},
-  "devDependencies": {
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "licenses": [
+    {
+      "type": "MIT"
+    }
+  ],
+  "keywords": [
+    "WebComponent",
+    "jira"
+  ],
+  "maintainers": [
+    {
+      "name": "Cole Diffin",
+      "email": "cole.diffin@orionhealth.com"
+    }
+  ],
+  "directories": {},
+  "dependencies": {
+    "jira": "arcticShadow/node-jira",
+    "nconf": "^0.7.1",
+
     "brfs": "^1.1.1",
     "browserify": "^4.1.5",
     "function-bind": "^0.1.0",
@@ -44,28 +66,5 @@
     "normalizecss": "^3.0.0",
     "opn": "^0.1.2",
     "through": "^2.3.4"
-  },
-  "engines": {
-    "node": ">=0.10.0"
-  },
-  "licenses": [
-    {
-      "type": "MIT"
-    }
-  ],
-  "keywords": [
-    "WebComponent",
-    "jira"
-  ],
-  "maintainers": [
-    {
-      "name": "Cole Diffin",
-      "email": "cole.diffin@orionhealth.com"
-    }
-  ],
-  "directories": {},
-  "dependencies": {
-    "jira": "arcticShadow/node-jira",
-    "nconf": "^0.7.1"
   }
 }
