@@ -22,13 +22,15 @@ var gulp = require('gulp'),
 gulp.task('default', ['clean', 'compile']);
 gulp.task('demo', ['compile', 'watch', 'connect']);
 gulp.task('compile', ['compile:lib', 'compile:demo']);
-gulp.task('compile:lib', ['stylus', 'browserify:lib']);
+gulp.task('compile:lib', ['stylus', 'jade:lib', 'browserify:lib']);
 gulp.task('compile:demo', ['jade', 'browserify:demo']);
 
 gulp.task('watch', function() {
-  gulp.watch('lib/*', ['compile:lib', 'browserify:demo']);
-  gulp.watch('demo/src/*.jade', ['jade']);
+  gulp.watch(['lib/*','config.j*'], ['compile:lib', 'browserify:demo']);
+  gulp.watch(['demo/src/*.jade'], ['jade']);
   gulp.watch('demo/src/**/*.js', ['browserify:demo']);
+  gulp.watch('lib/src/*.jade', ['jade:lib']);
+  gulp.watch('dist/src/*.html', ['browserify']);
 });
 
 gulp.task('watch:lib', function() {
@@ -55,6 +57,11 @@ gulp.task('clean:stylus', function() {
 
 gulp.task('clean:jade', function() {
   return gulp.src(['demo/dist/index.html'], { read: false })
+    .pipe(clean());
+});
+
+gulp.task('clean:jade:lib', function() {
+  return gulp.src(['dist/src/*.html'], { read: false })
     .pipe(clean());
 });
 
@@ -113,6 +120,14 @@ gulp.task('jade', ['clean:jade'], function() {
     .pipe(connect.reload());
 });
 
+gulp.task('jade:lib', ['clean:jade:lib'], function() {
+  return gulp.src('lib/src/*.jade')
+    .pipe(isDemo ? plumber() : through())
+    .pipe(jade({ pretty: true }))
+    .pipe(gulp.dest('dist/src'))
+    .pipe(connect.reload());
+});
+
 gulp.task('connect', ['compile'], function(done) {
   connect.server({
     root: 'demo/dist',
@@ -127,3 +142,17 @@ gulp.task('deploy', ['compile:demo'], function(done) {
 });
 
 gulp.task('serve', ['connect', 'watch']);
+
+
+gulp.task('jira:proxy', function(){
+var express = require('express');
+var request = require('request');
+
+var app = express();
+app.use('/', function(req, res) {
+  var url = apiServerHost + req.url;
+  req.pipe(request(url)).pipe(res);
+});
+
+app.listen(process.env.PORT || 3000);
+});
