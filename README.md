@@ -1,56 +1,57 @@
-[![Build Status](https://secure.travis-ci.org/bensternthal/bespoke-theme-mozilla-sandstone.png?branch=master)](https://travis-ci.org/bensternthal/bespoke-theme-mozilla-sandstone)
-
-# bespoke-theme-mozilla-sandstone
-
-Mozilla Sandstone [Bespoke.js](http://markdalgleish.com/projects/bespoke.js) Theme &mdash; [View demo](http://bensternthal.github.io/bespoke-theme-mozilla-sandstone)
-
-## Download
-
-Download the [production version][min] or the [development version][max], or use a [package manager](#package-managers).
-
-[min]: https://raw.github.com/bensternthal/bespoke-theme-mozilla-sandstone/master/dist/bespoke-theme-mozilla-sandstone.min.js
-[max]: https://raw.github.com/bensternthal/bespoke-theme-mozilla-sandstone/master/dist/bespoke-theme-mozilla-sandstone.js
+# Jira Web Component
 
 ## Usage
 
-This theme is shipped in a [UMD format](https://github.com/umdjs/umd), meaning that it is available as a CommonJS/AMD module or browser global.
-
-For example, when using CommonJS modules:
 
 ```js
-var bespoke = require('bespoke'),
-  mozillaSandstone = require('bespoke-theme-mozilla-sandstone');
+// new component
+var jiraWebComponent = require('jiraWebComponent');
 
-bespoke.from('#presentation', [
-  mozillaSandstone()
-]);
+// Custom Jira Config
+jiraWebComponent.configure({
+    user: 'xxx',
+    pass: 'yyy',
+    host: 'localhost', // I run this through a Proxy
+    port: 3000
+});
+jiraWebComponent.render('74651', '#component');
+
 ```
 
-When using browser globals:
-
-```js
-bespoke.from('#presentation', [
-  bespoke.themes.mozillaSandstone()
-]);
-```
 
 ## Package managers
 
 ### npm
 
 ```bash
-$ npm install bespoke-theme-mozilla-sandstone
+$ npm install arcticShadow/jiraWebComponent
 ```
 
-### Bower
+## API
 
-```bash
-$ bower install bespoke-theme-mozilla-sandstone
+### jiraWebComponent.configure(properties)
+Takes an object of properties and merges them into the config object.
+
+The defaults are below, you can override any/all of them.
+```js
+{        
+    protocol: 'http',
+    host: 'jira-proxy.devbox-dokku.orion.internal',
+    port: '80',
+    apiVersion: '2',
+    verbose: false,
+    strictSSL: false
+}
 ```
+
+### jiraWebComponent.render(filterID, selector)
+filterID is a Jira filter ID.
+
+selector is anything valid to pass to document.querySelecor. This is where your componentent will render.
 
 ## Credits
 
-This theme was built with [generator-bespoketheme](https://github.com/markdalgleish/generator-bespoketheme).
+This was built by Cole Diffin
 
 ## License
 
