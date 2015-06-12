@@ -82,7 +82,7 @@ gulp.task('browserify', ['browserify:lib', 'browserify:demo']);
 gulp.task('browserify:lib', ['clean:browserify:lib', 'stylus'], function() {
   return gulp.src('lib/jiraWebComponent.js')
     .pipe(isDemo ? plumber() : through())
-    .pipe(browserify({ transform: ['brfs'] }))
+    .pipe(browserify({ transform: ['brfs'], standalone: 'jiraWebComponent'  }))
     .pipe(header(template([
       '/*!',
       ' * <%= name %> v<%= version %>',

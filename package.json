@@ -18,7 +18,6 @@
   },
   "scripts": {
     "test": "gulp",
-    "postinstall": "gulp clean compile"
   },
   "peerDependencies": {},
   "engines": {
@@ -41,8 +40,10 @@
   ],
   "directories": {},
   "dependencies": {
+
+  },
+  "devDependencies": {
     "jira": "arcticShadow/node-jira",
-    "nconf": "^0.7.1",
 
     "brfs": "^1.1.1",
     "browserify": "^4.1.5",
