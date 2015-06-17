@@ -44,6 +44,7 @@
     "bluebird": "^2.9.30",
     "request": "^2.57.0",
     "lodash": "^2.4.1",
+    "jira": "arcticShadow/node-jira",
     "superagent": "^1.2.0"
   },
   "devDependencies": {
@@ -67,7 +68,6 @@
     "gulp-uglify": "^0.3.0",
     "gulp-util": "^2.2.19",
     "insert-css": "^0.2.0",
-    "jira": "arcticShadow/node-jira",
     "normalizecss": "^3.0.0",
     "opn": "^0.1.2",
     "serve-index": "^1.7.0",
