@@ -1,9 +1,16 @@
 'use strict';
-var conf = {};
-conf = require('./config.json');
-var _ = require('lodash');
+var fs = require('fs'),
+    _ = require('lodash'),
+    conf,
+    defaults,
+    data,
+    configFile;
 
-var defaults = {
+conf = data = {};
+
+configFile = './config.json';
+
+defaults = {
     protocol: 'http',
     host: 'jira',
     port: '80',
@@ -12,14 +19,14 @@ var defaults = {
     strictSSL: false
 };
 
-var data = {};
-
 data.overrides = function (a) {
      _.assign(data, a);
 };
 
 _.assign(data, defaults, conf);
 
-
+if( fs.existsSync(configFile) ){
+    data.overrides(require(configFile));
+}
 
 module.exports = data;
