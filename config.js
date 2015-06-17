@@ -1,10 +1,11 @@
+'use strict';
 var conf = {};
-//conf = require('./config.json');
+conf = require('./config.json');
 var _ = require('lodash');
 
 var defaults = {
     protocol: 'http',
-    host: 'jira-proxy.devbox-dokku.orion.internal',
+    host: 'jira',
     port: '80',
     apiVersion: '2',
     verbose: false,

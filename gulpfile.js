@@ -1,3 +1,4 @@
+'use strict';
 var gulp = require('gulp'),
   gutil = require('gulp-util'),
   clean = require('gulp-clean'),
@@ -8,7 +9,10 @@ var gulp = require('gulp'),
   autoprefixer = require('gulp-autoprefixer'),
   csso = require('gulp-csso'),
   jade = require('gulp-jade'),
-  connect = require('gulp-connect'),
+  express = require('express'),
+  serveIndex = require('serve-index'),
+  serveStatic = require('serve-static'),
+  http = require('http'),
   plumber = require('gulp-plumber'),
   opn = require('opn'),
   pkg = require('./package.json'),
@@ -17,19 +21,20 @@ var gulp = require('gulp'),
   path = require('path'),
   ghpages = require('gh-pages'),
   template = require('lodash').template,
+  jiraWebComponentMiddleware = require(__dirname + '/lib/jiraWebComponent').Middleware,
   isDemo = process.argv.indexOf('demo') > 0;
 
 gulp.task('default', ['clean', 'compile']);
 gulp.task('demo', ['compile', 'watch', 'connect']);
 gulp.task('compile', ['compile:lib', 'compile:demo']);
-gulp.task('compile:lib', ['stylus', 'jade:lib', 'browserify:lib']);
+gulp.task('compile:lib', ['browserify:lib']);
 gulp.task('compile:demo', ['jade', 'browserify:demo']);
 
 gulp.task('watch', function() {
   gulp.watch(['lib/*','config.j*'], ['compile:lib', 'browserify:demo']);
   gulp.watch(['demo/src/*.jade'], ['jade']);
   gulp.watch('demo/src/**/*.js', ['browserify:demo']);
-  gulp.watch('lib/src/*.jade', ['jade:lib']);
+  //gulp.watch('lib/src/*.jade', ['jade:lib']); // covered by lib*
   gulp.watch('dist/src/*.html', ['browserify']);
 });
 
@@ -41,7 +46,7 @@ gulp.task('clean', ['clean:browserify', 'clean:stylus', 'clean:jade']);
 gulp.task('clean:browserify', ['clean:browserify:lib', 'clean:browserify:demo']);
 
 gulp.task('clean:browserify:lib', function() {
-  return gulp.src(['dist'], { read: false })
+  return gulp.src(['dist/jiraWebComponent*'], { read: false })
     .pipe(clean());
 });
 
@@ -62,7 +67,7 @@ gulp.task('clean:jade', function() {
 
 gulp.task('clean:jade:lib', function() {
   return gulp.src(['dist/src/*.html'], { read: false })
-    .pipe(clean());
+    .pipe(clean({force:true}));
 });
 
 gulp.task('stylus', ['clean:stylus'], function() {
@@ -79,8 +84,8 @@ gulp.task('stylus', ['clean:stylus'], function() {
 
 gulp.task('browserify', ['browserify:lib', 'browserify:demo']);
 
-gulp.task('browserify:lib', ['clean:browserify:lib', 'stylus'], function() {
-  return gulp.src('lib/jiraWebComponent.js')
+gulp.task('browserify:lib', ['clean:browserify:lib', 'stylus', 'jade:lib'], function() {
+  return gulp.src('lib/jiraWebComponentFrontend.js')
     .pipe(isDemo ? plumber() : through())
     .pipe(browserify({ transform: ['brfs'], standalone: 'jiraWebComponent'  }))
     .pipe(header(template([
@@ -93,7 +98,7 @@ gulp.task('browserify:lib', ['clean:browserify:lib', 'stylus'], function() {
       ' */\n\n'
     ].join('\n'), pkg)))
     .pipe(gulp.dest('dist'))
-    .pipe(rename('jiraWebComponent.min.js'))
+    .pipe(rename('jiraWebComponentFrontend.min.js'))
     .pipe(uglify())
     .pipe(header(template([
       '/*! <%= name %> v<%= version %> ',
@@ -109,7 +114,8 @@ gulp.task('browserify:demo', ['clean:browserify:demo'], function() {
     .pipe(browserify({ transform: ['brfs'] }))
     .pipe(rename('build.js'))
     .pipe(gulp.dest('demo/dist/build'))
-    .pipe(connect.reload());
+    //.pipe(connect.reload())
+    ;
 });
 
 gulp.task('jade', ['clean:jade'], function() {
@@ -117,7 +123,8 @@ gulp.task('jade', ['clean:jade'], function() {
     .pipe(isDemo ? plumber() : through())
     .pipe(jade({ pretty: true }))
     .pipe(gulp.dest('demo/dist'))
-    .pipe(connect.reload());
+    //.pipe(connect.reload())
+    ;
 });
 
 gulp.task('jade:lib', ['clean:jade:lib'], function() {
@@ -125,14 +132,23 @@ gulp.task('jade:lib', ['clean:jade:lib'], function() {
     .pipe(isDemo ? plumber() : through())
     .pipe(jade({ pretty: true }))
     .pipe(gulp.dest('dist/src'))
-    .pipe(connect.reload());
+    //.pipe(connect.reload())
+    ;
 });
 
 gulp.task('connect', ['compile'], function(done) {
-  connect.server({
-    root: 'demo/dist',
-    livereload: true
-  });
+  var app, server;
+  app = express();
+  server = http.createServer(app);
+
+
+  app.use(serveStatic('demo/dist'));
+  app.use(serveIndex('demo/dist'));
+  app.get('/jiraSearch/:filterID', jiraWebComponentMiddleware({
+    filterParam:'filterID'
+  }));
+
+  server.listen(8080);
 
   opn('http://localhost:8080', done);
 });
@@ -144,15 +160,4 @@ gulp.task('deploy', ['compile:demo'], function(done) {
 gulp.task('serve', ['connect', 'watch']);
 
 
-gulp.task('jira:proxy', function(){
-var express = require('express');
-var request = require('request');
 
-var app = express();
-app.use('/', function(req, res) {
-  var url = apiServerHost + req.url;
-  req.pipe(request(url)).pipe(res);
-});
-
-app.listen(process.env.PORT || 3000);
-});
