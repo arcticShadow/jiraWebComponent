@@ -145,7 +145,9 @@ gulp.task('connect', ['compile'], function(done) {
   app.use(serveStatic('demo/dist'));
   app.use(serveIndex('demo/dist'));
   app.get('/jiraSearch/:filterID', jiraWebComponentMiddleware({
-    filterParam:'filterID'
+    filterParam:'filterID',
+    user: 'coledi',
+    password: 'Ohkuninushi_'
   }));
 
   server.listen(8080);
